@@ -1,0 +1,83 @@
+<div class="card">
+  <div class="card-content">
+    <div class="card-header">
+      <h5 class="card-title">
+        Form {{ survey.id > 0 ? "Update" : "Create" }} Survey
+      </h5>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="onSubmit(surveyForm)" #surveyForm="ngForm">
+        
+        <!-- Correo del encuestado -->
+        <div>
+          <input
+            placeholder="Email"
+            type="email"
+            name="email"
+            [(ngModel)]="survey.email"
+            class="form-control my-2"
+            #email="ngModel"
+            required
+          />
+          <div *ngIf="errors?.email" class="text-danger">{{ errors.email }}</div>
+        </div>
+
+        <!-- Número de documento -->
+        <div>
+          <input
+            placeholder="Document Number"
+            type="number"
+            name="document_number"
+            [(ngModel)]="survey.document_number"
+            class="form-control my-2"
+            #document_number="ngModel"
+            required
+          />
+          <div *ngIf="errors?.document_number" class="text-danger">{{ errors.document_number }}</div>
+        </div>
+
+        <!-- Descripción de la encuesta -->
+        <div>
+          <textarea
+            placeholder="Description"
+            name="description"
+            [(ngModel)]="survey.description"
+            class="form-control my-2"
+            #description="ngModel"
+            required
+          ></textarea>
+          <div *ngIf="errors?.description" class="text-danger">{{ errors.description }}</div>
+        </div>
+
+        <!-- Fecha de Respuesta -->
+        <div>
+          <input
+            type="date"
+            name="response_date"
+            [(ngModel)]="survey.response_date"
+            class="form-control my-2"
+            #response_date="ngModel"
+            required
+          />
+          <div *ngIf="errors?.response_date" class="text-danger">{{ errors.response_date }}</div>
+        </div>
+
+        <!-- Botones -->
+        <div>
+          <button type="submit" class="btn btn-primary m-2">
+            {{ survey.id > 0 ? "Update" : "Create" }}
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary my-2"
+            (click)="onClear(surveyForm)"
+          >
+            Clear
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<h3>{{ title }}</h3>
+
+<button class="btn btn-primary my-3" [routerLink]="['/surveys/create']">
+  Crear Encuesta
+</button>
+
+@if (surveys.length === 0) {
+<div class="alert alert-warning">No hay encuestas disponibles!</div>
+} @else {
+<table class="table table-hover table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Email</th>
+      <th>Número de Documento</th>
+      <th>Descripción</th>
+      <th>Fecha de Respuesta</th>
+      <th>Eliminar</th>
+      <th>Editar</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (survey of surveys; track survey.id) {
+    <tr>
+      <td>{{ survey.id }}</td>
+      <td>{{ survey.email }}</td>
+      <td>{{ survey.document_number }}</td>
+      <td>{{ survey.description }}</td>
+      <td>
+        {{
+          survey.response_date
+            ? (survey.response_date | date : "short")
+            : "Sin fecha"
+        }}
+      </td>
+      <td>
+        <button
+          class="btn btn-danger btn-sm"
+          (click)="onRemoveSurvey(survey.id)"
+          aria-label="Eliminar encuesta"
+        >
+          Eliminar
+        </button>
+
+        <button
+          class="btn btn-info btn-sm"
+          [routerLink]="['/surveys/edit', survey.id]"
+          aria-label="Editar encuesta"
+        >
+          Editar
+        </button>
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
+}
+
+<paginator [paginator]="paginator" [url]="'/surveys/page'"></paginator>
