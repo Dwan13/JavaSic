@@ -20,8 +20,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.springboot.backend.felipe.usersanswers.answers_backend.entities.Survey;
 import com.springboot.backend.felipe.usersanswers.answers_backend.entities.User;
 import com.springboot.backend.felipe.usersanswers.answers_backend.models.UserRequest;
 import com.springboot.backend.felipe.usersanswers.answers_backend.services.UserService;
@@ -29,22 +32,30 @@ import com.springboot.backend.felipe.usersanswers.answers_backend.services.UserS
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PutMapping;
+import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@CrossOrigin(origins={"http://localhost:4200"})
+@CrossOrigin(origins = { "http://localhost:4200" })
 @RestController
 @RequestMapping("/api/users")
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class UserController {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService service;
 
     @GetMapping
-    public List<User> list() {
+    public List<User> listUser() {
+        log.info("Entrando al método listUser()");
         return service.findAll();
     }
 
     @GetMapping("/page/{page}")
     public Page<User> listPageable(@PathVariable Integer page) {
+        log.info("Entrando al método listPageable()");
+
         Pageable pageable = PageRequest.of(page, 4);
         return service.findAll(pageable);
     }
@@ -58,7 +69,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Collections.singletonMap("error", "el usuario no se encontro por el id:" + id));
     }
-    
+
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result) {
         if (result.hasErrors()) {
@@ -67,15 +78,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
     }
 
-
-
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@Valid @RequestBody UserRequest user, BindingResult result, @PathVariable Long id) {
 
         if (result.hasErrors()) {
             return validation(result);
         }
-        
+
         Optional<User> userOptional = service.update(user, id);
 
         if (userOptional.isPresent()) {
@@ -93,7 +102,61 @@ public class UserController {
         }
         return ResponseEntity.notFound().build();
     }
-    
+
+
+    @GetMapping("/surveys")
+    public List<Survey> listSurvey() {
+        List<Survey> surveys = service.findAllSurvey();
+        for (Survey survey : surveys) {
+            Hibernate.initialize(survey.getUser()); // Forzar la carga de la relación LAZY
+        }
+        return surveys;
+    }
+
+    // Endpoint para obtener surveys por userId
+    @GetMapping("/{id}/surveys")
+    public ResponseEntity<Page<Survey>> getSurveysByUserId(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Survey> surveys = service.findSurveysByUserId(id, pageable);
+
+        return ResponseEntity.ok(surveys);
+    }
+
+    // Endpoint para actualizar una survey por userId
+    @PutMapping("/{id}/surveys/{surveyId}")
+    public ResponseEntity<?> updateSurveyByUserId(
+            @PathVariable Long id,
+            @PathVariable Long surveyId,
+            @RequestBody Survey updatedSurvey) {
+
+        Optional<Survey> surveyOptional = service.updateSurveyByUserId(id, surveyId, updatedSurvey);
+
+        if (surveyOptional.isPresent()) {
+            return ResponseEntity.ok(surveyOptional.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Collections.singletonMap("error", "Survey no encontrada o no pertenece al usuario"));
+    }
+
+    // Endpoint para eliminar una survey por userId
+    @DeleteMapping("/{id}/surveys/{surveyId}")
+    public ResponseEntity<?> deleteSurveyByUserId(
+            @PathVariable Long id,
+            @PathVariable Long surveyId) {
+
+        try {
+            service.deleteSurveyByUserId(id, surveyId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
     private ResponseEntity<?> validation(BindingResult result) {
         Map<String, String> errors = new HashMap<>();
         result.getFieldErrors().forEach(error -> {

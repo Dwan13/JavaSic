@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import static jakarta.persistence.GenerationType.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Id;
 
 @Entity
@@ -19,9 +22,8 @@ public class Survey {
     @Email
     private String email;
 
-  
     @NotBlank
-    private Number document_number;
+    private Integer document_number;
 
     @NotEmpty
     private String comments;
@@ -31,12 +33,12 @@ public class Survey {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false) // Especificamos la clave foránea
+    @JsonBackReference
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "brand_id", nullable = false)
     private BrandPC brand;
-
 
     // Getters y Setters
 
@@ -47,22 +49,13 @@ public class Survey {
     public void setId(Long id) {
         this.id = id;
     }
-    
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-   
-
-    public Number getDocument_number() {
-        return document_number;
-    }
-
-    public void setDocument_number(Number document_number) {
-        this.document_number = document_number;
     }
 
     public String getComments() {
@@ -89,6 +82,19 @@ public class Survey {
         this.user = user;
     }
 
-    public BrandPC getBrand() { return brand; }
-    public void setBrand(BrandPC brand) { this.brand = brand; }
+    public BrandPC getBrand() {
+        return brand;
+    }
+
+    public void setBrand(BrandPC brand) {
+        this.brand = brand;
+    }
+
+    public Integer getDocument_number() {
+        return document_number;
+    }
+
+    public void setDocument_number(Integer document_number) {
+        this.document_number = document_number;
+    }
 }

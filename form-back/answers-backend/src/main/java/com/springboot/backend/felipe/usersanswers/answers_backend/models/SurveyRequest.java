@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 public class SurveyRequest {
 
     @NotBlank
-    private Number document_number;
+    private Integer document_number;
 
     @NotEmpty
     private String comments;
@@ -29,11 +29,11 @@ public class SurveyRequest {
         this.email = email;
     }
 
-    public Number getDocument_number() {
+    public Integer getDocument_number() {
         return document_number;
     }
 
-    public void setDocument_number(Number document_number) {
+    public void setDocument_number(Integer document_number) {
         this.document_number = document_number;
     }
 

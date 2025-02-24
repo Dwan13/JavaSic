@@ -12,25 +12,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.springboot.backend.felipe.usersanswers.answers_backend.entities.Role;
+import com.springboot.backend.felipe.usersanswers.answers_backend.entities.Survey;
 import com.springboot.backend.felipe.usersanswers.answers_backend.entities.User;
 import com.springboot.backend.felipe.usersanswers.answers_backend.models.IUser;
 import com.springboot.backend.felipe.usersanswers.answers_backend.models.UserRequest;
 import com.springboot.backend.felipe.usersanswers.answers_backend.repositories.RoleRepository;
+import com.springboot.backend.felipe.usersanswers.answers_backend.repositories.SurveyRepository;
 import com.springboot.backend.felipe.usersanswers.answers_backend.repositories.UserRepository;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private UserRepository repository;
     private RoleRepository roleRepository;
+    private SurveyRepository surveyRepository;
 
     private PasswordEncoder passwordEncoder;
-    
-    
-    public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+
+    public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder,
+            RoleRepository roleRepository, SurveyRepository surveyRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.surveyRepository = surveyRepository;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -59,7 +63,7 @@ public class UserServiceImpl implements UserService{
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return repository.save(user);
     }
-    
+
     @Override
     @Transactional
     public Optional<User> update(UserRequest user, Long id) {
@@ -94,6 +98,53 @@ public class UserServiceImpl implements UserService{
             optionalRoleAdmin.ifPresent(roles::add);
         }
         return roles;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Survey> findAllSurvey() {
+        return (List) surveyRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Survey> findSurveysByUserId(Long userId, Pageable pageable) {
+        return surveyRepository.findByUserId(userId, pageable);
+    }
+
+    @Override
+    @Transactional
+    public Optional<Survey> updateSurveyByUserId(Long userId, Long surveyId, Survey updatedSurvey) {
+        // Buscar la survey por id y userId
+        Optional<Survey> surveyOptional = surveyRepository.findByIdAndUserId(surveyId, userId);
+
+        if (surveyOptional.isPresent()) {
+            Survey survey = surveyOptional.get();
+            // Actualizar los campos de la survey
+            survey.setEmail(updatedSurvey.getEmail());
+            survey.setDocument_number(updatedSurvey.getDocument_number());
+            survey.setComments(updatedSurvey.getComments());
+            survey.setResponse_date(updatedSurvey.getResponse_date());
+            survey.setBrand(updatedSurvey.getBrand());
+
+            // Guardar la survey actualizada
+            return Optional.of(surveyRepository.save(survey));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    @Transactional
+    public void deleteSurveyByUserId(Long userId, Long surveyId) {
+        // Buscar la survey por id y userId
+        Optional<Survey> surveyOptional = surveyRepository.findByIdAndUserId(surveyId, userId);
+
+        if (surveyOptional.isPresent()) {
+            // Eliminar la survey si existe y pertenece al usuario
+            surveyRepository.deleteById(surveyId);
+        } else {
+            throw new RuntimeException("Survey no encontrada o no pertenece al usuario");
+        }
     }
 
 }
