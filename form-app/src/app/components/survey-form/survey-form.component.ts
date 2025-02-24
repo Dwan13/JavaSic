@@ -18,13 +18,13 @@ export class SurveyFormComponent implements OnInit {
   errors: any = {};
   userId: number = 0; // Almacena el userId como número
   computerTypes: { id: number; name: string }[] = [];
-
+  hasId: boolean = false;
   constructor(
     private service: SurveyService,
     private sharingData: SharingDataService,
     private route: ActivatedRoute,
     private authStore: AuthService
-    
+
   ) {
     this.survey = new Survey();
   }
@@ -44,6 +44,7 @@ export class SurveyFormComponent implements OnInit {
       const id: number = +(params.get('id') || '0');
 
       if (id > 0) {
+        this.hasId = true;
         this.sharingData.findSurveyByIdEventEmitter.emit(id);
       }
     });
@@ -52,12 +53,12 @@ export class SurveyFormComponent implements OnInit {
   }
 
   onSubmit(surveyForm: NgForm): void {
-console.log('surveyForm', surveyForm.form.value);
-let surveyNew = surveyForm.form.value
-let formattedSurvey = {
-  ...this.survey,
-  brand: { id: surveyNew.computer_type, name: surveyNew.email.toString() },
-};
+    console.log('surveyForm', surveyForm.form.value);
+    let surveyNew = surveyForm.form.value
+    let formattedSurvey = {
+      ...this.survey,
+      brand: { id: surveyNew.computer_type, name: surveyNew.email.toString() },
+    };
 
     this.sharingData.newSurveyEventEmitter.emit({ idUser: this.userId, survey: formattedSurvey });
   }

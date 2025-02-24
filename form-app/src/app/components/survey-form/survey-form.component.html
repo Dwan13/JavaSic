@@ -45,12 +45,19 @@
             name="computer_type"
             [(ngModel)]="survey.brand"
             class="form-control my-2"
-            required
+            required={{!hasId}}
           >
-            <option value="" disabled selected>Select Computer Type</option>
-            <option *ngFor="let type of computerTypes" [value]="type.id">
-              {{ type.name }}
-            </option>
+            <option value="" disabled selected={{!hasId}}>Select Computer Type</option>
+            @if (hasId && !survey.brand) {
+              <option *ngFor="let type of survey.brand" selected [value]="type.id">
+                {{ type.name }}
+              </option>
+            }@else {
+              <option *ngFor="let type of computerTypes" [value]="type.id">
+                {{ type.name }}
+              </option>
+            }
+         
           </select>
           <div *ngIf="errors?.computer_type" class="text-danger">
             {{ errors.computer_type }}

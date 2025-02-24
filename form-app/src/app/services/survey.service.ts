@@ -29,15 +29,17 @@ export class SurveyService {
   // Crear una nueva survey para un usuario específico
   create(userId: number, survey: Survey): Observable<Survey> {
     
-    const { id, ...userWithoutId } = survey; 
-    console.log('userWithoutId', survey, 'userId', userId);
+    const { id, ...surveyWithoutId } = survey; 
 
-    return this.http.post<Survey>(`${this.baseUrl}/${userId}/surveys`, userWithoutId);
+    return this.http.post<Survey>(`${this.baseUrl}/${userId}/surveys`, surveyWithoutId);
   }
 
   // Actualizar una survey existente para un usuario específico
-  update(survey: Survey): Observable<Survey> {
-    return this.http.put<Survey>(`${this.baseUrl}/${survey.user_id}/surveys/${survey.id}`, survey);
+  update(userId: number, survey: Survey): Observable<Survey> {
+    console.log('surveyWithoutId', survey, 'userId', userId);
+    const { id, ...surveyWithoutId } = survey; 
+
+    return this.http.put<Survey>(`${this.baseUrl}/${userId}/surveys/${survey.id}`, surveyWithoutId);
   }
 
   // Eliminar una survey por su ID y el ID del usuario

@@ -214,7 +214,7 @@ export class UserAppComponent implements OnInit {
   addSurvey() {
     this.sharingData.newSurveyEventEmitter.subscribe(survey => {
       if (survey.survey.id > 0) {
-        this.serviceSurvey.update(survey.survey).subscribe(
+        this.serviceSurvey.update(survey.idUser, survey.survey).subscribe(
           {
             next: (surveyUpdated) => {
               this.surveys = this.surveys.map(s => (s.id == surveyUpdated.id) ? { ...surveyUpdated } : s);
