@@ -12,11 +12,7 @@ import com.springboot.backend.felipe.usersanswers.answers_backend.entities.User;
 import com.springboot.backend.felipe.usersanswers.answers_backend.models.UserRequest;
 
 public interface UserService {
-    List<User> findAll();
-    
-    List<Survey> findAllSurvey();
-    
-    Page<Survey> findSurveysByUserId(Long userId, Pageable pageable);
+    List<User> findAll();    
 
     Page<User> findAll(Pageable pageable);
 
@@ -27,6 +23,12 @@ public interface UserService {
     Optional<User> update(UserRequest user, Long id);
 
     void deleteById(Long id);
+
+    List<Survey> findAllSurvey();
+
+    Page<Survey> findSurveysByUserId(@NonNull Long userId, Pageable pageable);
+
+    Survey createSurvey(Long userId, Survey survey);
 
     Optional<Survey> updateSurveyByUserId(Long userId, Long surveyId, Survey updatedSurvey);
 

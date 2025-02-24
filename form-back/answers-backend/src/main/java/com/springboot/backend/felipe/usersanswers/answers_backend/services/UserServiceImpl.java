@@ -114,6 +114,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public Survey createSurvey(Long userId, Survey survey) {
+        // Buscar al usuario por su ID
+        Optional<User> userOptional = repository.findById(userId);
+    
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+    
+            // Asociar la survey al usuario
+            survey.setUser(user);
+    
+            // Guardar la survey en la base de datos
+            return surveyRepository.save(survey);
+        } else {
+            throw new RuntimeException("Usuario no encontrado con ID: " + userId);
+        }
+    }
+
+    @Override
+    @Transactional
     public Optional<Survey> updateSurveyByUserId(Long userId, Long surveyId, Survey updatedSurvey) {
         // Buscar la survey por id y userId
         Optional<Survey> surveyOptional = surveyRepository.findByIdAndUserId(surveyId, userId);

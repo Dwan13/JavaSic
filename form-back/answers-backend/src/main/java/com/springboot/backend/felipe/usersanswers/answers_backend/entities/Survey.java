@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 import static jakarta.persistence.GenerationType.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -22,7 +24,7 @@ public class Survey {
     @Email
     private String email;
 
-    @NotBlank
+    @NotNull
     private Integer document_number;
 
     @NotEmpty

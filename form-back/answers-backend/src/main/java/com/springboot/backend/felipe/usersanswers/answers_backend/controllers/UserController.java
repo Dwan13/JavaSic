@@ -103,7 +103,6 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-
     @GetMapping("/surveys")
     public List<Survey> listSurvey() {
         List<Survey> surveys = service.findAllSurvey();
@@ -118,12 +117,33 @@ public class UserController {
     public ResponseEntity<Page<Survey>> getSurveysByUserId(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "4") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Survey> surveys = service.findSurveysByUserId(id, pageable);
 
         return ResponseEntity.ok(surveys);
+    }
+
+    @PostMapping("/{id}/surveys")
+    public ResponseEntity<?> createSurvey(
+            @PathVariable Long id,
+            @Valid @RequestBody Survey survey,
+            BindingResult result) {
+
+        // Validar los datos de la survey
+        if (result.hasErrors()) {
+            return validation(result);
+        }
+
+        try {
+            // Crear la survey asociada al usuario
+            Survey createdSurvey = service.createSurvey(id, survey);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdSurvey);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
     }
 
     // Endpoint para actualizar una survey por userId
