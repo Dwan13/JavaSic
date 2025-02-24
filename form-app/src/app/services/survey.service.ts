@@ -9,31 +9,45 @@ import { environment } from '../../environment/environment';
 })
 export class SurveyService {
 
-  private baseUrl: string = `${environment.url_survays}`;
+  private baseUrl: string = `${environment.url_users}`;
+  private domino: string = `${environment.url}`;
 
   constructor(private http: HttpClient) {}
 
-  findAll(): Observable<Survey[]> {
-    return this.http.get<Survey[]>(`${this.baseUrl}`);
+  // Obtener todas las surveys de un usuario específico
+  findAllByUserId(userId: number, page: number): Observable<Survey> {
+    console.log('userId', userId);
+    
+    return this.http.get<Survey>(`${this.baseUrl}/${userId}/surveys`);
   }
 
-  findAllPageable(page: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/page/${page}`);
+  // Obtener una survey por su ID y el ID del usuario
+  findAllPageable(page: number): Observable<Survey> {
+    return this.http.get<Survey>(`${this.baseUrl}/surveys?page=${page}`);
   }
 
-  findById(id: number): Observable<Survey> {
-    return this.http.get<Survey>(`${this.baseUrl}/${id}`);
+  // Crear una nueva survey para un usuario específico
+  create(userId: number, survey: Survey): Observable<Survey> {
+    
+    const { id, ...userWithoutId } = survey; 
+    console.log('userWithoutId', survey, 'userId', userId);
+
+    return this.http.post<Survey>(`${this.baseUrl}/${userId}/surveys`, userWithoutId);
   }
 
-  create(survey: Survey): Observable<Survey> {
-    return this.http.post<Survey>(this.baseUrl, survey);
-  }
-
+  // Actualizar una survey existente para un usuario específico
   update(survey: Survey): Observable<Survey> {
-    return this.http.put<Survey>(`${this.baseUrl}/${survey.id}`, survey);
+    return this.http.put<Survey>(`${this.baseUrl}/${survey.user_id}/surveys/${survey.id}`, survey);
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  // Eliminar una survey por su ID y el ID del usuario
+  delete(userId: number ,survey: Survey): Observable<void> {    
+    return this.http.delete<void>(`${this.baseUrl}/${userId}/surveys/${survey.id}`);
   }
+  
+  getBrands(): Observable<{ id: number, name: string }[]> {
+    return this.http.get<{ id: number, name: string }[]>(`${this.domino}api/brands`);
+  }
+  
+  
 }

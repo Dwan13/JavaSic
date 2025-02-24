@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { User } from '../models/user';
 import { UserService } from '../services/user.service';
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component';
 import { SharingDataService } from '../services/sharing-data.service';
 import { AuthService } from '../services/auth.service';
+import { Survey } from '../models/survey';
+import { User } from '../models/user';
+import { SurveyService } from '../services/survey.service';
 
 @Component({
   selector: 'user-app',
@@ -15,16 +17,18 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./user-app.component.scss']
 })
 export class UserAppComponent implements OnInit {
-
   users: User[] = [];
+  surveys: Survey[] = [];
   paginator: any = {};
+  paginatorSurveys: any = {};
 
   constructor(
     private router: Router,
     private service: UserService,
+    private serviceSurvey: SurveyService,
     private sharingData: SharingDataService,
     private authService: AuthService,
-  private route: ActivatedRoute) {
+    private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
@@ -40,16 +44,18 @@ export class UserAppComponent implements OnInit {
     this.findUserById();
     this.pageUsersEvent();
     this.handlerLogin();
+    this.pageSurveyEvent();
+    this.findSurveyById();
+    this.addSurvey();
+    this.removeSurvey();
   }
 
   handlerLogin() {
     this.sharingData.handlerLoginEventEmitter.subscribe(({ username, password }) => {
-      console.log(username + ' ' + password);
 
       this.authService.loginUser({ username, password }).subscribe({
         next: response => {
           const token = response.token;
-          console.log(token);
           const payload = this.authService.getPayload(token);
 
           const user = { username: payload.sub };
@@ -58,11 +64,11 @@ export class UserAppComponent implements OnInit {
             isAuth: true,
             isAdmin: payload.isAdmin
           };
-          
+
           this.authService.token = token;
           this.authService.user = login;
           if (this.authService.isAdmin()) this.router.navigate(['/users/page/0']);
-          this.router.navigate(['/surveys/page/0']);
+          this.router.navigate(['users/surveys']);
         },
         error: error => {
           if (error.status == 401) {
@@ -102,8 +108,9 @@ export class UserAppComponent implements OnInit {
                 state: {
                   users: this.users,
                   paginator: this.paginator
-               } });
-            
+                }
+              });
+
               Swal.fire({
                 title: "Actualizado!",
                 text: "Usuario editado con exito!",
@@ -119,17 +126,18 @@ export class UserAppComponent implements OnInit {
           })
 
       } else {
-        this.service.create(user).subscribe( {
-          next: userNew =>  {
-          console.log(user)
-          this.users = [... this.users, { ...userNew }];
+        this.service.create(user).subscribe({
+          next: userNew => {
+            console.log(user)
+            this.users = [... this.users, { ...userNew }];
 
             this.router.navigate(['/users'], {
               state: {
                 users: this.users,
                 paginator: this.paginator
-             } });
-            
+              }
+            });
+
             Swal.fire({
               title: "Creado nuevo usuario!",
               text: "Usuario creado con exito!",
@@ -143,7 +151,8 @@ export class UserAppComponent implements OnInit {
               this.sharingData.errorsUserFormEventEmitter.emit(err.error);
             }
 
-        }})
+          }
+        })
       }
 
     })
@@ -169,7 +178,8 @@ export class UserAppComponent implements OnInit {
                 state: {
                   users: this.users,
                   paginator: this.paginator
-               } });
+                }
+              });
             });
           })
 
@@ -183,5 +193,117 @@ export class UserAppComponent implements OnInit {
       });
     });
   }
+  ///////////
 
+  pageSurveyEvent() {
+    this.sharingData.pageSurveysEventEmitter.subscribe(pageable => {
+      this.surveys = pageable.surveys;
+      this.paginatorSurveys = pageable.paginator;
+    });
+  }
+
+  findSurveyById() {
+    this.sharingData.findSurveyByIdEventEmitter.subscribe(id => {
+
+      const survey = this.surveys.find(survey => survey.id == id);
+
+      this.sharingData.selectSurveyEventEmitter.emit(survey);
+    })
+  }
+
+  addSurvey() {
+    this.sharingData.newSurveyEventEmitter.subscribe(survey => {
+      if (survey.survey.id > 0) {
+        this.serviceSurvey.update(survey.survey).subscribe(
+          {
+            next: (surveyUpdated) => {
+              this.surveys = this.surveys.map(s => (s.id == surveyUpdated.id) ? { ...surveyUpdated } : s);
+              this.router.navigate(['/users/surveys'], {
+                state: {
+                  users: this.surveys,
+                  paginator: this.paginatorSurveys
+                }
+              });
+
+              Swal.fire({
+                title: "Actualizada!",
+                text: "Encuesta editada con exito!",
+                icon: "success"
+              });
+            },
+            error: (err) => {
+              // console.log(err.error)
+              if (err.status == 400) {
+                this.sharingData.errorsSurveyFormEventEmitter.emit(err.error);
+              }
+            }
+          })
+
+      } else {
+        this.serviceSurvey.create(survey.idUser, survey.survey).subscribe({
+          next: surveyNew => {
+            this.surveys = [... this.surveys, { ...surveyNew }];
+
+            this.router.navigate(['/users/surveys'], {
+              state: {
+                surveys: this.surveys,
+                paginator: this.paginatorSurveys
+              }
+            });
+
+            Swal.fire({
+              title: "Creado nueva Encuesta!",
+              text: "Encuesta creada con exito!",
+              icon: "success"
+            });
+          },
+          error: (err) => {
+            // console.log(err.error)
+            // console.log(err.status)
+            if (err.status == 400) {
+              this.sharingData.errorsSurveyFormEventEmitter.emit(err.error);
+            }
+
+          }
+        })
+      }
+
+    })
+  }
+
+  removeSurvey(): void {
+    this.sharingData.idSurveyEventEmitter.subscribe(({idUser, survey}) => {
+      Swal.fire({
+        title: "Seguro que quiere eliminar?",
+        text: "Cuidado la encuesta sera eliminada del sistema!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si"
+      }).then((result) => {
+        if (result.isConfirmed) {
+
+          this.serviceSurvey.delete(idUser, survey).subscribe(() => {
+            this.surveys = this.surveys.filter(survey => survey.id != idUser);
+            this.router.navigate(['/users/surveys'], { skipLocationChange: true }).then(() => {
+              this.router.navigate(['/users'], {
+                state: {
+                  surveys: this.surveys,
+                  paginator: this.paginatorSurveys
+                }
+              });
+            });
+          })
+
+
+          Swal.fire({
+            title: "Eliminada!",
+            text: "Encuesta eliminada con exito.",
+            icon: "success"
+          });
+        }
+      });
+    });
+  }
 }

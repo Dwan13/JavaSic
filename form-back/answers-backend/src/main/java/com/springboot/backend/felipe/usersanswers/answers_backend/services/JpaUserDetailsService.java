@@ -39,14 +39,7 @@ public class JpaUserDetailsService implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
 
-        return new org.springframework.security.core.userdetails.User(username,
-                user.getPassword(),
-                true,
-                true,
-                true,
-                true,
-                authorities);
-
+        // 🔹 Ahora retornamos CustomUserDetails con el ID incluido
+        return new CustomUserDetails(user.getId(), username, user.getPassword(), authorities);
     }
-
 }

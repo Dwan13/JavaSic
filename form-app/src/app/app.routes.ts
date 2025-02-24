@@ -21,7 +21,7 @@ export const routes: Routes = [
     {
         path: 'users/page/:page',
         component: UserComponent,
-    },
+    }, 
     {
         path: 'users/create', 
         component: UserFormComponent,
@@ -35,19 +35,15 @@ export const routes: Routes = [
 
     // Rutas para Encuestas
     {
-        path: 'surveys',
+        path: 'users/surveys',
         component: SurveyComponent,
     },
     {
-        path: 'surveys/page/:page',
-        component: SurveyComponent,
-    },
-    {
-        path: 'surveys/create', 
+        path: 'users/surveys/create', 
         component: SurveyFormComponent,
     },
     {
-        path: 'surveys/edit/:id',
+        path: 'users/surveys/edit/:id',
         component: SurveyFormComponent,
     },
 

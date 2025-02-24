@@ -80,4 +80,14 @@ export class AuthService {
     sessionStorage.removeItem('token');
   }
 
+  getUserIdFromToken(): number {
+    const token = this.token; // Usa el getter ya definido
+    if (token) {
+      const payload = this.getPayload(token);
+      return payload?.userId ?? 0;
+    }
+    return 0;
+  }
+  
+
 }

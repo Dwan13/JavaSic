@@ -17,8 +17,8 @@ export class SharingDataService {
   private _handlerLoginEventEmitter = new EventEmitter();
 
   // Encuestas
-  private _newSurveyEventEmitter: EventEmitter<Survey> = new EventEmitter();
-  private _idSurveyEventEmitter = new EventEmitter<number>();
+  private _newSurveyEventEmitter = new EventEmitter<{ idUser: number, survey: Survey }>();
+  private _idSurveyEventEmitter = new EventEmitter<{ idUser: number, survey: Survey }>();
   private _findSurveyByIdEventEmitter = new EventEmitter<number>();
   private _selectSurveyEventEmitter = new EventEmitter<Survey>();
   private _errorsSurveyFormEventEmitter = new EventEmitter<string[]>();
@@ -72,11 +72,11 @@ export class SharingDataService {
     return this._findSurveyByIdEventEmitter;
   }
 
-  get newSurveyEventEmitter(): EventEmitter<Survey> {
+  get newSurveyEventEmitter() {
     return this._newSurveyEventEmitter;
   }
 
-  get idSurveyEventEmitter(): EventEmitter<number> {
+  get idSurveyEventEmitter() {
     return this._idSurveyEventEmitter;
   }
 }

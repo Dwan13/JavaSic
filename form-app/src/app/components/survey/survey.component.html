@@ -1,6 +1,6 @@
 <h3>{{ title }}</h3>
 
-<button class="btn btn-primary my-3" [routerLink]="['/surveys/create']">
+<button class="btn btn-primary my-3" [routerLink]="['/users/surveys/create']">
   Crear Encuesta
 </button>
 
@@ -25,7 +25,7 @@
       <td>{{ survey.id }}</td>
       <td>{{ survey.email }}</td>
       <td>{{ survey.document_number }}</td>
-      <td>{{ survey.description }}</td>
+      <td>{{ survey.comments }}</td>
       <td>
         {{
           survey.response_date
@@ -36,12 +36,13 @@
       <td>
         <button
           class="btn btn-danger btn-sm"
-          (click)="onRemoveSurvey(survey.id)"
+          (click)="onRemoveSurvey(survey)"
           aria-label="Eliminar encuesta"
         >
           Eliminar
         </button>
-
+      </td>
+      <td>
         <button
           class="btn btn-info btn-sm"
           [routerLink]="['/surveys/edit', survey.id]"

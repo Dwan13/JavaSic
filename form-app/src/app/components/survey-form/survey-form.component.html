@@ -7,7 +7,6 @@
     </div>
     <div class="card-body">
       <form (ngSubmit)="onSubmit(surveyForm)" #surveyForm="ngForm">
-        
         <!-- Correo del encuestado -->
         <div>
           <input
@@ -19,7 +18,9 @@
             #email="ngModel"
             required
           />
-          <div *ngIf="errors?.email" class="text-danger">{{ errors.email }}</div>
+          <div *ngIf="errors?.email" class="text-danger">
+            {{ errors.email }}
+          </div>
         </div>
 
         <!-- Número de documento -->
@@ -33,7 +34,27 @@
             #document_number="ngModel"
             required
           />
-          <div *ngIf="errors?.document_number" class="text-danger">{{ errors.document_number }}</div>
+          <div *ngIf="errors?.document_number" class="text-danger">
+            {{ errors.document_number }}
+          </div>
+        </div>
+
+        <!-- Tipo de Computador (Opciones desde la BD) -->
+        <div>
+          <select
+            name="computer_type"
+            [(ngModel)]="survey.brand"
+            class="form-control my-2"
+            required
+          >
+            <option value="" disabled selected>Select Computer Type</option>
+            <option *ngFor="let type of computerTypes" [value]="type.id">
+              {{ type.name }}
+            </option>
+          </select>
+          <div *ngIf="errors?.computer_type" class="text-danger">
+            {{ errors.computer_type }}
+          </div>
         </div>
 
         <!-- Descripción de la encuesta -->
@@ -41,12 +62,14 @@
           <textarea
             placeholder="Description"
             name="description"
-            [(ngModel)]="survey.description"
+            [(ngModel)]="survey.comments"
             class="form-control my-2"
             #description="ngModel"
             required
           ></textarea>
-          <div *ngIf="errors?.description" class="text-danger">{{ errors.description }}</div>
+          <div *ngIf="errors?.description" class="text-danger">
+            {{ errors.description }}
+          </div>
         </div>
 
         <!-- Fecha de Respuesta -->
@@ -59,7 +82,9 @@
             #response_date="ngModel"
             required
           />
-          <div *ngIf="errors?.response_date" class="text-danger">{{ errors.response_date }}</div>
+          <div *ngIf="errors?.response_date" class="text-danger">
+            {{ errors.response_date }}
+          </div>
         </div>
 
         <!-- Botones -->
@@ -76,7 +101,6 @@
             Clear
           </button>
         </div>
-
       </form>
     </div>
   </div>
