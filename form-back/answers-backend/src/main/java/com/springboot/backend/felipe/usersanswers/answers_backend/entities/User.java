@@ -85,7 +85,7 @@ public class User implements IUser {
     private List<Role> roles;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("user-survey") // 🔹 Debe coincidir con Survey
+    @JsonManagedReference("user-survey") // Debe coincidir con Survey
     private List<Survey> surveys;
 
     public User() {

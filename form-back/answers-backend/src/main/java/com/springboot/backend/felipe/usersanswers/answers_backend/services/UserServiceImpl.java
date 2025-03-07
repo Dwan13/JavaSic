@@ -24,7 +24,7 @@ import com.springboot.backend.felipe.usersanswers.answers_backend.repositories.U
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final int MAX_FAILED_ATTEMPTS = 3; // 🔹 Intentos permitidos antes del bloqueo
+    private static final int MAX_FAILED_ATTEMPTS = 3; // Intentos permitidos antes del bloqueo
 
     @Autowired
     private UserRepository repository;

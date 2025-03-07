@@ -65,9 +65,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             Authentication authResult) throws IOException, ServletException {
 
-        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal(); // 🔹 Usa CustomUserDetails
+        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal(); //Usa CustomUserDetails
         String username = userDetails.getUsername();
-        Long userId = userDetails.getId(); // 🔹 Obtener el ID correctamente
+        Long userId = userDetails.getId(); // Obtener el ID correctamente
         Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
         boolean isAdmin = roles.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
 
@@ -76,7 +76,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .add("authorities", new ObjectMapper().writeValueAsString(roles))
                 .add("username", username)
                 .add("isAdmin", isAdmin)
-                .add("userId", userId) // 🔹 Agregar el ID correctamente
+                .add("userId", userId) // Agregar el ID correctamente
                 .build();
 
         String jwt = Jwts.builder()
@@ -92,7 +92,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Map<String, String> body = new HashMap<>();
         body.put("token", jwt);
         body.put("username", username);
-        body.put("userId", userId.toString()); // 🔹 Incluir el ID en la respuesta
+        body.put("userId", userId.toString()); // Incluir el ID en la respuesta
         body.put("message", String.format("Hola %s has iniciado sesión con éxito", username));
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(body));
