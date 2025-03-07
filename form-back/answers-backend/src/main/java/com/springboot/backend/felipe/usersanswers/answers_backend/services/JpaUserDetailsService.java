@@ -39,7 +39,6 @@ public class JpaUserDetailsService implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
 
-        // 🔹 Ahora retornamos CustomUserDetails con el ID incluido
         return new CustomUserDetails(user.getId(), username, user.getPassword(), authorities);
     }
 }

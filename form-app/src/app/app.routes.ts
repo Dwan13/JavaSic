@@ -6,12 +6,17 @@ import { SurveyFormComponent } from './components/survey-form/survey-form.compon
 import { AuthComponent } from './components/auth/auth.component';
 import { Forbidden403Component } from './components/forbidden403/forbidden403.component';
 import { authGuard } from './guards/auth.guard';
+import { HomeComponent } from './components/home/home.component';
 
 export const routes: Routes = [
     {
         path: '',
         pathMatch: 'full',
-        redirectTo: '/users/create'
+        redirectTo: '/home'
+    },
+    {
+        path: 'home',
+        component: HomeComponent,
     },
     // Rutas para Usuarios
     {

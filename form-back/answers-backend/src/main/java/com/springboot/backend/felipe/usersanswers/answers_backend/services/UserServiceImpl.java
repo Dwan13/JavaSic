@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
@@ -23,7 +24,11 @@ import com.springboot.backend.felipe.usersanswers.answers_backend.repositories.U
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final int MAX_FAILED_ATTEMPTS = 3; // 🔹 Intentos permitidos antes del bloqueo
+
+    @Autowired
     private UserRepository repository;
+
     private RoleRepository roleRepository;
     private SurveyRepository surveyRepository;
 
@@ -117,13 +122,13 @@ public class UserServiceImpl implements UserService {
     public Survey createSurvey(Long userId, Survey survey) {
         // Buscar al usuario por su ID
         Optional<User> userOptional = repository.findById(userId);
-    
+
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-    
+
             // Asociar la survey al usuario
             survey.setUser(user);
-    
+
             // Guardar la survey en la base de datos
             return surveyRepository.save(survey);
         } else {
@@ -164,6 +169,54 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new RuntimeException("Survey no encontrada o no pertenece al usuario");
         }
+    }
+
+    @Override
+    @Transactional
+    public void increaseFailedAttempts(Long userId) {
+        Optional<User> userOptional = repository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            int attempts = user.getFailed_attempts() != null ? user.getFailed_attempts() : 0;
+            attempts++;
+
+            if (attempts >= MAX_FAILED_ATTEMPTS) {
+                user.setLocked_account(true);
+            }
+
+            user.setFailed_attempts(attempts);
+            repository.save(user);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void resetFailedAttempts(Long userId) {
+        Optional<User> userOptional = repository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setFailed_attempts(0);
+            repository.save(user);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void unlockAccount(Long userId) {
+        Optional<User> userOptional = repository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setFailed_attempts(0);
+            user.setLocked_account(false);
+            repository.save(user);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isAccountLocked(Long userId) {
+        Optional<User> userOptional = repository.findById(userId);
+        return userOptional.map(User::getLocked_account).orElse(false);
     }
 
 }

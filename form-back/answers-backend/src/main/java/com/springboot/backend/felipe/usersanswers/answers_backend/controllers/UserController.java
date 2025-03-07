@@ -178,14 +178,6 @@ public class UserController {
         }
     }
 
-    private ResponseEntity<?> validation(BindingResult result) {
-        Map<String, String> errors = new HashMap<>();
-        result.getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), "El campo " + error.getField() + " " + error.getDefaultMessage());
-        });
-        return ResponseEntity.badRequest().body(errors);
-    }
-
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal User userDetails) {
         Map<String, Object> response = new HashMap<>();
@@ -193,5 +185,13 @@ public class UserController {
         response.put("username", userDetails.getUsername());
         response.put("isAdmin", userDetails.isAdmin());
         return ResponseEntity.ok(response);
+    }
+
+    private ResponseEntity<?> validation(BindingResult result) {
+        Map<String, String> errors = new HashMap<>();
+        result.getFieldErrors().forEach(error -> {
+            errors.put(error.getField(), "El campo " + error.getField() + " " + error.getDefaultMessage());
+        });
+        return ResponseEntity.badRequest().body(errors);
     }
 }

@@ -34,11 +34,11 @@ public class Survey {
     private String response_date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false) // Especificamos la clave foránea
-    @JsonBackReference
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference("user-survey")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id", nullable = false)
     private BrandPC brand;
 

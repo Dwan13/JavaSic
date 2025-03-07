@@ -1,5 +1,6 @@
 package com.springboot.backend.felipe.usersanswers.answers_backend.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.springboot.backend.felipe.usersanswers.answers_backend.models.IUser;
 
@@ -16,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
@@ -43,7 +46,7 @@ public class User implements IUser {
     private String email;
 
     @NotBlank
-    @Size(min=4, max = 12)
+    @Size(min = 4, max = 12)
     private String username;
 
     @Transient
@@ -53,35 +56,37 @@ public class User implements IUser {
     @NotBlank
     private String password;
 
+    private Boolean locked_account = false;
+    private Integer failed_attempts = 0;
 
-   private Boolean locked_account;
-   private Integer failed_attempts;
-   
+    
+
     public Boolean getLocked_account() {
-      return locked_account;
-   }
+        return locked_account;
+    }
 
-   public void setLocked_account(Boolean locked_account) {
-      this.locked_account = locked_account;
-   }
+    public void setLocked_account(Boolean locked_account) {
+        this.locked_account = locked_account;
+    }
 
-   public Integer getFailed_attempts() {
-      return failed_attempts;
-   }
+    public Integer getFailed_attempts() {
+        return failed_attempts;
+    }
 
-   public void setFailed_attempts(Integer failed_attempts) {
-      this.failed_attempts = failed_attempts;
-   }
+    public void setFailed_attempts(Integer failed_attempts) {
+        this.failed_attempts = failed_attempts;
+    }
 
-   @JsonIgnoreProperties({"handler", "hibernateLazyInitializer"})
+    @JsonIgnoreProperties({ "handler", "hibernateLazyInitializer" })
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name="users_roles",
-        joinColumns = {@JoinColumn(name="user_id")},
-        inverseJoinColumns = @JoinColumn(name="role_id"),
-        uniqueConstraints = { @UniqueConstraint(columnNames = {"user_id", "role_id"})}
-    )
+    @JoinTable(name = "users_roles", joinColumns = {
+            @JoinColumn(name = "user_id") }, inverseJoinColumns = @JoinColumn(name = "role_id"), uniqueConstraints = {
+                    @UniqueConstraint(columnNames = { "user_id", "role_id" }) })
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("user-survey") // 🔹 Debe coincidir con Survey
+    private List<Survey> surveys;
 
     public User() {
         this.roles = new ArrayList<>();
@@ -90,36 +95,47 @@ public class User implements IUser {
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getLastname() {
         return lastname;
     }
+
     public void setLastname(String lastname) {
         this.lastname = lastname;
     }
+
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
+
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
+
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -140,5 +156,4 @@ public class User implements IUser {
         this.admin = admin;
     }
 
-    
 }
