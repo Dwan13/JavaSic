@@ -13,7 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder; 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -43,9 +43,7 @@ public class SpringSecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         return http.authorizeHttpRequests(authz -> authz
-                .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/page/{page}", "/api/users/surveys",
-                        "/api/users/{id}/surveys", "/api/brands", "/api/users/me")
-                .permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/page/{page}", "/api/users/surveys", "/api/users/{id}/surveys","/api/brands", "/api/users/me").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/users/{id}/surveys").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")

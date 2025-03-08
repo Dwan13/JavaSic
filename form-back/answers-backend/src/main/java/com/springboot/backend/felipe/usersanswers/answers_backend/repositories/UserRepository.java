@@ -16,4 +16,12 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
         Optional<User> findByUsername(String name);
 
+        @Modifying
+        @Query("UPDATE User u SET u.failed_attempts = :failedAttempts WHERE u.id = :id")
+        void updateFailedAttempts(@Param("failedAttempts") int failedAttempts, @Param("id") Long id);
+
+        @Modifying
+        @Query("UPDATE User u SET u.locked_account = :locked WHERE u.id = :id")
+        void updateLockedAccount(@Param("locked") boolean locked, @Param("id") Long id);
+
 }
